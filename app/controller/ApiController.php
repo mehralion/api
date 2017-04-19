@@ -8,6 +8,7 @@
 namespace app\controller;
 
 
+use app\component\VarDumper;
 use app\helper\FileHelper;
 use app\model\Clan;
 use app\model\ClanWarNew;
@@ -18,6 +19,7 @@ use app\model\RuinesMap;
 use app\model\User;
 use app\model\UserAbils;
 use app\model\UserComplect;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class ApiController extends BaseController
 {
@@ -195,6 +197,10 @@ class ApiController extends BaseController
 			FileHelper::writeException($ex, 'api');
 		}
 
+		if(isset($user_id) && $user_id == 546433) {
+			$memory_string = sprintf('Pic: %sMB. Current: %sMB', memory_get_peak_usage(true)/1024/1024, memory_get_usage(true)/1024/1024);
+			FileHelper::write($memory_string, 'memory_player');
+		}
 		$this->renderJSON($response);
 	}
 
@@ -270,6 +276,9 @@ class ApiController extends BaseController
 				throw new \Exception('Invalid USER');
 			}
 
+			if(isset($user_id) && $user_id == 546433) {
+				$this->_cache = false;
+			}
 			if($this->_cache) {
 				$response = $this->app->cache->get('api_user_inventory_'.$user_id);
 				if($response) {
@@ -283,9 +292,10 @@ class ApiController extends BaseController
 				'items' => array(),
 			);
 
-			//get items
-			$Inventory = Inventory::whereRaw('owner = ?', [$User['id']])->get()->toArray();
-			foreach ($Inventory as $_item) {
+			$pdo = Capsule::connection()->getPdo();
+			$stmt = $pdo->prepare('select i.id, i.name, i.letter, i.dressed, i.goden, i.dategoden, i.duration, i.maxdur, i.massa, i.includemagic, i.includemagicname, i.includemagicdex, i.includemagicmax, i.includemagicuses from inventory i where i.owner = :owner');
+			$stmt->execute([':owner' => $User['id']]);
+			while ($_item = $stmt->fetch(\PDO::FETCH_ASSOC)) {
 				$temp = array(
 					'id'            => (int)$_item['id'],
 					'name'          => $_item['name'],
@@ -310,6 +320,9 @@ class ApiController extends BaseController
 				}
 
 				$data['items'][] = $temp;
+
+				unset($temp);
+				unset($_item);
 			}
 
 			$response = array(
@@ -332,6 +345,11 @@ class ApiController extends BaseController
 			);
 
 			FileHelper::writeException($ex, 'api');
+		}
+
+		if(isset($user_id) && $user_id == 546433) {
+			$memory_string = sprintf('Pic: %sMB. Current: %sMB', memory_get_peak_usage(true)/1024/1024, memory_get_usage(true)/1024/1024);
+			FileHelper::write($memory_string, 'memory_inventory2');
 		}
 
 		$this->renderJSON($response);
