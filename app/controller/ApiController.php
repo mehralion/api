@@ -22,6 +22,7 @@ use app\model\UserComplect;
 class ApiController extends BaseController
 {
 	private $_cache_time = 10;
+	private $_cache = true;
 
 	public function beforeAction($action)
 	{
@@ -47,12 +48,14 @@ class ApiController extends BaseController
 				throw new \Exception('Invalid USER');
 			}
 
-			$response = $this->app->cache->get('api_user_player_'.$user_id);
-			if($response) {
-				$response['cache'] = true;
-				$this->renderJSON($response);
-			}
+			if($this->_cache) {
+				$response = $this->app->cache->get('api_user_player_'.$user_id);
+				if($response) {
+					$response['cache'] = true;
+					$this->renderJSON($response);
+				}
 
+			}
 
 			$data = array(
 				'date' => time(),
@@ -108,7 +111,7 @@ class ApiController extends BaseController
 			//get clan war
 			if($User['klan']) {
 				/** @var Clan $Clan */
-				$Clan = Clan::where('short', '=', $User['klan'])->first()->get();
+				$Clan = Clan::where('short', '=', $User['klan'])->first();
 				if($Clan) {
 					$Clan = $Clan->toArray();
 					$ClanWar = ClanWarNew::whereRaw('agressor = ? or defender = ?', [$Clan['id'], $Clan['id']])->first();
@@ -178,7 +181,9 @@ class ApiController extends BaseController
 				'response'  => $data
 			);
 
-			$this->app->cache->set('api_user_player_'.$user_id, $response, $this->_cache_time);
+			if($this->_cache) {
+				$this->app->cache->set('api_user_player_'.$user_id, $response, $this->_cache_time);
+			}
 
 		} catch (\Exception $ex) {
 			$response = array(
@@ -208,10 +213,12 @@ class ApiController extends BaseController
 				throw new \Exception('Invalid USER');
 			}
 
-			$response = $this->app->cache->get('api_user_quest_'.$user_id);
-			if($response) {
-				$response['cache'] = true;
-				$this->renderJSON($response);
+			if($this->_cache) {
+				$response = $this->app->cache->get('api_user_quest_'.$user_id);
+				if($response) {
+					$response['cache'] = true;
+					$this->renderJSON($response);
+				}
 			}
 
 			/*$Quest = $this->app->quest
@@ -231,7 +238,9 @@ class ApiController extends BaseController
 				'response'  => $data
 			);
 
-			$this->app->cache->set('api_user_quest_'.$user_id, $response, $this->_cache_time);
+			if($this->_cache) {
+				$this->app->cache->set('api_user_quest_'.$user_id, $response, $this->_cache_time);
+			}
 
 		} catch (\Exception $ex) {
 			$response = array(
@@ -261,10 +270,12 @@ class ApiController extends BaseController
 				throw new \Exception('Invalid USER');
 			}
 
-			$response = $this->app->cache->get('api_user_inventory_'.$user_id);
-			if($response) {
-				$response['cache'] = true;
-				$this->renderJSON($response);
+			if($this->_cache) {
+				$response = $this->app->cache->get('api_user_inventory_'.$user_id);
+				if($response) {
+					$response['cache'] = true;
+					$this->renderJSON($response);
+				}
 			}
 
 			$data = array(
@@ -308,7 +319,9 @@ class ApiController extends BaseController
 				'response'  => $data
 			);
 
-			$this->app->cache->set('api_user_inventory_'.$user_id, $response, $this->_cache_time);
+			if($this->_cache) {
+				$this->app->cache->set('api_user_inventory_'.$user_id, $response, $this->_cache_time);
+			}
 
 		} catch (\Exception $ex) {
 			$response = array(
@@ -340,10 +353,12 @@ class ApiController extends BaseController
 				throw new \Exception('Invalid USER');
 			}
 
-			$response = $this->app->cache->get('api_user_ruine_'.$user_id);
-			if($response) {
-				$response['cache'] = true;
-				$this->renderJSON($response);
+			if($this->_cache) {
+				$response = $this->app->cache->get('api_user_ruine_'.$user_id);
+				if($response) {
+					$response['cache'] = true;
+					$this->renderJSON($response);
+				}
 			}
 
 			$data = array(
@@ -414,7 +429,9 @@ class ApiController extends BaseController
 				'response'  => $data
 			);
 
-			$this->app->cache->set('api_user_ruine_'.$user_id, $response, $this->_cache_time);
+			if($this->_cache) {
+				$this->app->cache->set('api_user_ruine_'.$user_id, $response, $this->_cache_time);
+			}
 
 		} catch (\Exception $ex) {
 			$response = array(
