@@ -8,5 +8,16 @@
       "name": "author's name",
       "email": "email@example.com"
     }
-  ]
+  ],
+  "require": {
+    "slim/slim": "2.6.3",
+    "phpfastcache/phpfastcache" : "4.3.18",
+    "illuminate/database": "v5.4.17",
+    "illuminate/events": "v5.4.17"
+  },
+  "autoload":{
+    "psr-0":{
+      "app" : ""
+    }
+  }
 }
