@@ -151,8 +151,9 @@ class ApiController extends BaseController
 			}
 
             //account
-            $Account = Effect::whereRaw('type in (4999, 5999, 6999) and owner = ?', [$User['id']])->get()->toArray();
+            $Account = Effect::whereRaw('type in (4999, 5999, 6999) and owner = ?', [$User['id']])->first();
             if($Account) {
+            	$Account = $Account->toArray();
                 $name = 'silver';
                 if($Account['type'] == 5999) {
                     $name = 'gold';
@@ -179,7 +180,6 @@ class ApiController extends BaseController
                 //'crypt'     => $hash,
                 'message'   => 'We have some problem, try later',
             );
-			VarDumper::d($ex);
 			FileHelper::writeException($ex, 'api');
         }
 
@@ -310,6 +310,7 @@ class ApiController extends BaseController
                 //'crypt'     => $hash,
 				'message'   => 'We have some problem, try later',
             );
+
 			FileHelper::writeException($ex, 'api');
         }
 

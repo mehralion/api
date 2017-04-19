@@ -23,10 +23,12 @@ class Json
 
     protected static function array_encode(&$arr){
         array_walk_recursive($arr, function(&$val, &$key){
-            if(is_string($val))
+            /*
+        	if(is_string($val))
                 $val = iconv('windows-1251', 'utf-8', $val);
             if(is_string($key))
                 $key = iconv('windows-1251', 'utf-8', $key);
+            */
         });
         return $arr;
     }

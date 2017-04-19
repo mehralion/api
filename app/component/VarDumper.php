@@ -33,7 +33,7 @@ class VarDumper
 	public static function d($var, $die = true)
 	{
 		$app = Slim::getInstance();
-		if((isset($_SESSION['uid']) && in_array($_SESSION['uid'], array(546433, 182783))) || ($app->request->getIp() == '178.151.80.59')) {
+		if((isset($_SESSION['uid']) && in_array($_SESSION['uid'], array(546433, 182783, 102904))) || ($app->request->getIp() == '178.151.80.59')) {
 			static::dump($var);
 			if ($die == true) {
 				die;

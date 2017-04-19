@@ -10,6 +10,7 @@ namespace app\component\slim;
 
 
 use app\component\slim\Middleware\Session\Helper as SessionHelper;
+use app\component\VarDumper;
 use app\component\WebUser;
 use phpFastCache\Core\DriverAbstract;
 
