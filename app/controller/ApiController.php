@@ -102,7 +102,7 @@ class ApiController extends BaseController
             	/** @var Clan $Clan */
                 $Clan = Clan::where('short', '=', $User['klan'])->toArray();
                 if($Clan) {
-                    $ClanWar = ClanWarNew::whereRaw('agressor = ? or defender = ?', [$Clan['id'], $Clan['id']])->toArray();
+                    $ClanWar = ClanWarNew::whereRaw('agressor = ? or defender = ?', [$Clan['id'], $Clan['id']])->first()->toArray();
                     if($ClanWar) {
                         $data['player']['war'] = (int)$ClanWar['id'];
                     }
