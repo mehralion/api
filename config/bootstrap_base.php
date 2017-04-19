@@ -62,6 +62,9 @@ $capsule->setEventDispatcher(new Dispatcher(new Container));
 // Make this Capsule instance available globally via static methods... (optional)
 $capsule->setAsGlobal();
 
+// Setup the Eloquent ORM... (optional; unless you've used setEventDispatcher())
+$capsule->bootEloquent();
+
 $app->container->singleton('webUser', function () use ($app) {
 	return new app\component\WebUser();
 });
