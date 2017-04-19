@@ -7,6 +7,8 @@
  */
 
 namespace app\model;
+use app\helper\FileHelper;
+use Illuminate\Database\Query\Expression;
 
 /**
  * Class User
@@ -168,4 +170,61 @@ class User extends BaseModal
 	protected $table = 'users';
 
 	public $primaryKey = 'id';
+
+	public function getMassa()
+	{
+		try {
+			$gsum = 0;
+
+			/*
+			бонусы от прем. акк.
+			*/
+
+			//Отключать действие бонуса + к рюкзаку от премиум-аккаунтов в турнирах Башни смерти и Руин
+			if ($this->in_tower == 0 && $this->ruines == 0 && $this->prem > 0) {
+				$add_bonus[1] = 50;
+				$add_bonus[2] = 250;
+				$add_bonus[3] = 500;
+				$gsum += $add_bonus[$this->prem];
+			}
+
+
+			$Inventory = Inventory::whereRaw('owner = ? and gmeshok > 0', [$this->id])
+				->groupBy(['setsale', 'bs_owner'])
+				->get([new Expression('IFNULL(sum(gmeshok),0) as gmeshok, setsale, bs_owner')]);
+			foreach ($Inventory as $_item) {
+				if ($this->in_tower == $_item['bs_owner'] && $_item['setsale'] == 0) {
+					$gsum += $_item['gmeshok'];
+				}
+			}
+
+			return ($this->sila * 4 + $gsum);
+		} catch (\Exception $ex) {
+			FileHelper::writeException($ex, 'model_user');
+		}
+
+		return 0;
+	}
+
+	public function getUseMassa()
+	{
+		try {
+			$my_massa = 0;
+
+			$Inventory = Inventory::whereRaw('owner = ?', [$this->id])
+				->groupBy(['setsale', 'bs_owner', 'dressed'])
+				->get([new Expression('IFNULL(sum(`massa`),0) as massa , setsale, bs_owner, dressed')]);
+			foreach ($Inventory as $_item) {
+				if ($this->in_tower == $_item['bs_owner'] && $_item['setsale'] == 0 && $_item['dressed'] == 0) {
+					$my_massa += $_item['massa'];
+				}
+			}
+
+			return $my_massa;
+		} catch (\Exception $ex) {
+			FileHelper::writeException($ex, 'model_user');
+		}
+
+		return 0;
+	}
 }
