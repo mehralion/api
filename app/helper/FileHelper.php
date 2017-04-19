@@ -12,7 +12,7 @@ class FileHelper
     public static function write($content, $file_name = 'log', $ext = 'txt')
     {
         try {
-            $filePath = rtrim(ROOT_DIR, '/').'/components/logs/'.$file_name.'.'.$ext;
+            $filePath = rtrim(ROOT_DIR, '/').'/logs/'.$file_name.'.'.$ext;
 
             $date = new \DateTime();
             $text = "--------START ".$date->format('d.m.Y H:i:s')."-------\n";
@@ -30,7 +30,7 @@ class FileHelper
     public static function write2($content, $file_name = 'log', $ext = 'txt')
     {
         try {
-            $filePath = rtrim(ROOT_DIR, '/').'/components/logs/'.$file_name.'.'.$ext;
+            $filePath = rtrim(ROOT_DIR, '/').'/logs/'.$file_name.'.'.$ext;
 
             $h = fopen($filePath, "a");
             fwrite($h, $content);
@@ -43,7 +43,7 @@ class FileHelper
     public static function writeArray($content, $file_name = 'log', $ext = 'txt')
     {
         try {
-            $filePath = rtrim(ROOT_DIR, '/').'/components/logs/'.$file_name.'.'.$ext;
+            $filePath = rtrim(ROOT_DIR, '/').'/logs/'.$file_name.'.'.$ext;
 
             $date = new \DateTime();
             $text = "--------START ".$date->format('d.m.Y H:i:s')."-------\n";
