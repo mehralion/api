@@ -8,6 +8,7 @@
 namespace app\controller;
 
 
+use app\component\VarDumper;
 use app\helper\FileHelper;
 use app\model\Clan;
 use app\model\ClanWarNew;
@@ -100,17 +101,19 @@ class ApiController extends BaseController
             //get clan war
             if($User['klan']) {
             	/** @var Clan $Clan */
-                $Clan = Clan::where('short', '=', $User['klan'])->toArray();
+                $Clan = Clan::where('short', '=', $User['klan'])->first();
                 if($Clan) {
-                    $ClanWar = ClanWarNew::whereRaw('agressor = ? or defender = ?', [$Clan['id'], $Clan['id']])->first()->toArray();
+                	$Clan = $Clan->toArray();
+                    $ClanWar = ClanWarNew::whereRaw('agressor = ? or defender = ?', [$Clan['id'], $Clan['id']])->first();
                     if($ClanWar) {
+						$ClanWar = $ClanWar->toArray();
                         $data['player']['war'] = (int)$ClanWar['id'];
                     }
                 }
             }
 
             //get complect
-            $Complect = UserComplect::whereRaw('owner = ?', [$User['id']])->toArray();
+            $Complect = UserComplect::whereRaw('owner = ?', [$User['id']])->get()->toArray();
             foreach ($Complect as $_item) {
                 $data['player']['inventorysets'][] = array(
                     'id'    => (int)$_item['id'],
@@ -119,7 +122,7 @@ class ApiController extends BaseController
             }
 
             //get baffs
-            $Effects = Effect::whereRaw('owner = ? and type not in (4999, 5999, 6999) and name != ""', [$User['id']])->toArray();
+            $Effects = Effect::whereRaw('owner = ? and type not in (4999, 5999, 6999) and name != ""', [$User['id']])->get()->toArray();
             foreach ($Effects as $Effect) {
                 $data['player']['playerbuffs'][] = array(
                     'name'  => $Effect['name'],
@@ -129,7 +132,7 @@ class ApiController extends BaseController
             }
 
 			//get abils
-			$Abils = UserAbils::whereRaw('owner = ?', [$User['id']])->toArray();
+			$Abils = UserAbils::whereRaw('owner = ?', [$User['id']])->get()->toArray();
 			foreach ($Abils as $Abil) {
 				$temp = array(
 					'magic_id'  => (int)$Abil['magic_id'],
@@ -148,7 +151,7 @@ class ApiController extends BaseController
 			}
 
             //account
-            $Account = Effect::whereRaw('type in (4999, 5999, 6999) and owner = ?', [$User['id']])->toArray();
+            $Account = Effect::whereRaw('type in (4999, 5999, 6999) and owner = ?', [$User['id']])->get()->toArray();
             if($Account) {
                 $name = 'silver';
                 if($Account['type'] == 5999) {
@@ -176,6 +179,7 @@ class ApiController extends BaseController
                 //'crypt'     => $hash,
                 'message'   => 'We have some problem, try later',
             );
+			VarDumper::d($ex);
 			FileHelper::writeException($ex, 'api');
         }
 
@@ -262,7 +266,7 @@ class ApiController extends BaseController
             );
 
             //get items
-            $Inventory = Inventory::whereRaw('owner = ?', [$User['id']])->toArray();
+            $Inventory = Inventory::whereRaw('owner = ?', [$User['id']])->get()->toArray();
             foreach ($Inventory as $_item) {
                 $temp = array(
                     'id'            => (int)$_item['id'],
@@ -345,15 +349,17 @@ class ApiController extends BaseController
             if($User['ruines']) {
                 $Map = RuinesMap::find($User['ruines'])->toArray();
 
-                $UserList = User::whereRaw('ruines = ? and id_grup = ?', [$User['ruines'], $User['id_grup']])->toArray();
+                $UserList = User::whereRaw('ruines = ? and id_grup = ?', [$User['ruines'], $User['id_grup']])->get()->toArray();
                 foreach ($UserList as $_user) {
                     $frozen = -1;
-                    $EffectPuti = Effect::whereRaw('name = "Путы" and type = 10 and owner = ?', [$_user['id']])->toArray();
+					/** @var Effect $EffectPuti */
+                    $EffectPuti = Effect::whereRaw('name = "Путы" and type = 10 and owner = ?', [$_user['id']])->first();
                     if($EffectPuti) {
+                    	$EffectPuti = $EffectPuti->toArray();
                         $frozen = ($EffectPuti['time'] - time()) / 60;
                     }
 
-                    $Inventory = Inventory::whereRaw('owner = ? and bs_owner = 2', [$_user['id']])->toArray();
+                    $Inventory = Inventory::whereRaw('owner = ? and bs_owner = 2', [$_user['id']])->get()->toArray();
                     $items = array();
                     foreach ($Inventory  as $_inventory) {
                         $items[] = array(
@@ -386,9 +392,8 @@ class ApiController extends BaseController
                 /** @var RuinesItems[] $Items */
                 $Items = RuinesItems::whereIn('extra', $player_ids)
 					->whereRaw('type = 1 and name = "Ловушка"')
-					->get();
+					->get()->toArray();
                 foreach ($Items as $_item) {
-					$_item = $_item->toArray();
                     $room = $_item['room'] - $Map['rooms'];
                     $data['traps'][] = $this->app->ruine[$room][0];
                 }
