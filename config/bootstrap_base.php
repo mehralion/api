@@ -26,7 +26,8 @@ $app->configureMode('production', function () use ($app) {
 $app->container->singleton('cache', function () use ($app) {
 	$config = array(
 		'memcache' => array(
-			array('10.72.184.185', 11211, 1),
+			//array('10.72.184.185', 11211, 1),
+			array('127.0.0.1', 11211, 1),
 		),
 	);
 	\phpFastCache\CacheManager::setup($config);
