@@ -65,3 +65,46 @@ $capsule->setAsGlobal();
 $app->container->singleton('webUser', function () use ($app) {
 	return new app\component\WebUser();
 });
+
+register_shutdown_function(function() {
+	$error = error_get_last();
+	if(isset($error)) {
+		$message = sprintf('[%s] Level error: %s | message: %s | file: %s | line: %s', date('d.m.Y H:i:s'), $error['type'], $error['message'], $error['file'], $error['line']).PHP_EOL;
+
+		$filename = 'other';
+		$write = false;
+		switch ($error['type']) {
+			case E_ERROR:
+			case E_PARSE:
+			case E_COMPILE_ERROR:
+			case E_CORE_ERROR:
+				$filename = 'fatal';
+				$write = true;
+				break;
+			case E_USER_ERROR:
+			case E_RECOVERABLE_ERROR:
+				$filename = 'error';
+				$write = true;
+				break;
+			case E_WARNING:
+			case E_CORE_WARNING:
+			case E_COMPILE_WARNING:
+			case E_USER_WARNING:
+				$filename = 'warn';
+				$write = false;
+				break;
+			case E_NOTICE:
+			case E_USER_NOTICE:
+				$filename = 'info';
+				$write = false;
+				break;
+			case E_STRICT:
+				$filename = 'debug';
+				$write = true;
+				break;
+		}
+		if($write === true) {
+			\app\helper\FileHelper::write2($message, $filename);
+		}
+	}
+});
