@@ -113,19 +113,17 @@ class ApiController extends BaseController
 			//get clan war
 			if($User['klan']) {
 				/** @var Clan $Clan */
-				$Clan = Clan::where('short', '=', $User['klan'])->first();
+				$Clan = Clan::where('short', '=', $User['klan'])->first(['id']);
 				if($Clan) {
-					$Clan = $Clan->toArray();
-					$ClanWar = ClanWarNew::whereRaw('agressor = ? or defender = ?', [$Clan['id'], $Clan['id']])->first();
+					$ClanWar = ClanWarNew::whereRaw('agressor = ? or defender = ?', [$Clan['id'], $Clan['id']])->first(['id']);
 					if($ClanWar) {
-						$ClanWar = $ClanWar->toArray();
 						$data['player']['war'] = (int)$ClanWar['id'];
 					}
 				}
 			}
 
 			//get complect
-			$Complect = UserComplect::whereRaw('owner = ?', [$User['id']])->get()->toArray();
+			$Complect = UserComplect::whereRaw('owner = ?', [$User['id']])->get(['id','name']);
 			foreach ($Complect as $_item) {
 				$data['player']['inventorysets'][] = array(
 					'id'    => (int)$_item['id'],
@@ -134,7 +132,7 @@ class ApiController extends BaseController
 			}
 
 			//get baffs
-			$Effects = Effect::whereRaw('owner = ? and type not in (4999, 5999, 6999) and name != ""', [$User['id']])->get()->toArray();
+			$Effects = Effect::whereRaw('owner = ? and type not in (4999, 5999, 6999) and name != ""', [$User['id']])->get(['name','time','type']);
 			foreach ($Effects as $Effect) {
 				$data['player']['playerbuffs'][] = array(
 					'name'  => $Effect['name'],
@@ -144,7 +142,7 @@ class ApiController extends BaseController
 			}
 
 			//get abils
-			$Abils = UserAbils::whereRaw('owner = ?', [$User['id']])->get()->toArray();
+			$Abils = UserAbils::whereRaw('owner = ?', [$User['id']])->get(['magic_id','allcount','findata','daily','dailyc']);
 			foreach ($Abils as $Abil) {
 				$temp = array(
 					'magic_id'  => (int)$Abil['magic_id'],
@@ -163,9 +161,8 @@ class ApiController extends BaseController
 			}
 
 			//account
-			$Account = Effect::whereRaw('type in (4999, 5999, 6999) and owner = ?', [$User['id']])->first();
+			$Account = Effect::whereRaw('type in (4999, 5999, 6999) and owner = ?', [$User['id']])->first(['type', 'time']);
 			if($Account) {
-				$Account = $Account->toArray();
 				$name = 'silver';
 				if($Account['type'] == 5999) {
 					$name = 'gold';

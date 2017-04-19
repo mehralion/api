@@ -25,23 +25,21 @@ $app->configureMode('production', function () use ($app) {
 
 $app->container->singleton('cache', function () use ($app) {
 	/*$config = array(
-		'memcache' => array(
-			//array('10.72.184.185', 11211, 1),
-			array('127.0.0.1', 11211, 1),
-		),
-	);*/
-
-	$config = array(
 		"storage"   =>  "files", // memcached, redis, ssdb, ..etc
 		"path"      =>  ROOT_DIR."/tmp/cache/",
 		'securityKey' => 'cache',
 	);
-
 	\phpFastCache\CacheManager::setup($config);
+	return \phpFastCache\CacheManager::Files();*/
 
-	$Cache = \phpFastCache\CacheManager::Files();
-
-	return $Cache;
+	$config = array(
+		'memcache' => array(
+			//array('10.72.184.185', 11211, 1),
+			array('127.0.0.1', 11211, 1),
+		),
+	);
+	\phpFastCache\CacheManager::setup($config);
+	return \phpFastCache\CacheManager::Memcached();
 });
 
 $db_capital = $app->config('db.capital');
