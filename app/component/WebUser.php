@@ -8,6 +8,7 @@
 namespace app\component;
 
 
+use app\helper\FileHelper;
 use \app\model\User;
 
 class WebUser extends AbstractComponent
@@ -28,7 +29,7 @@ class WebUser extends AbstractComponent
             }
 
         } catch (\Exception $ex) {
-
+			FileHelper::writeException($ex);
         }
     }
 

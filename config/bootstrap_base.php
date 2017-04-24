@@ -55,7 +55,7 @@ $capsule->addConnection([
 	'collation' => 'utf8_unicode_ci',
 	'prefix'    => '',
 	'options' => array(
-		\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET time_zone = \'+03:00\';SET NAMES UTF8;',
+		\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES UTF8;',
 	)
 ]);
 
