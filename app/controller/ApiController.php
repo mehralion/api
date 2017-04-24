@@ -23,7 +23,7 @@ use Illuminate\Database\Query\Expression;
 
 class ApiController extends BaseController
 {
-	private $_cache_time = 100;
+	private $_cache_time = 10;
 	private $_cache = true;
 
 	public function beforeAction($action)
@@ -32,9 +32,9 @@ class ApiController extends BaseController
 		header("Access-Control-Allow-Origin: http://capitalcity.oldbk.com");
 
 		try {
-			if($this->app->webUser->getId() == 146913) {
+			if($this->app->webUser->getId() == 102904) {
 				$message = sprintf('%s. %s', (new \DateTime())->format('d.m.Y H:i:s'), $action).PHP_EOL;
-				FileHelper::write2($message, 'timer');
+				FileHelper::write2($message, '102904_timer');
 			}
 		} catch (\Exception $ex) {
 
