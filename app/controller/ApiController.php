@@ -323,11 +323,12 @@ class ApiController extends BaseController
 				'(i.prototype not between 1009999 and 1020001)',
 				'(i.prototype not between 15550 and 15569)'
 			];
-			$sql = sprintf('select i.id, i.name, i.letter, i.dressed, i.goden, i.dategoden, i.duration, i.maxdur, i.massa, i.includemagic, i.includemagicname, i.includemagicdex, i.includemagicmax, i.includemagicuses from inventory i where %s', implode(' and ', $_where));
+			$sql = sprintf('select i.id, i.name, i.letter, i.dressed, i.goden, i.dategoden, i.duration, i.maxdur, i.massa, i.includemagic, i.includemagicname, i.includemagicdex, i.includemagicmax, i.includemagicuses from inventory i USE INDEX (owner,type,prototype) where %s', implode(' and ', $_where));
 			$pdo = Capsule::connection()->getPdo();
 			$stmt = $pdo->prepare($sql);
 			$stmt->execute([':owner' => $User['id']]);
-			while ($_item = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+			$_items = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+			foreach ($_items as $_item) {
 				$temp = array(
 					'id'            => (int)$_item['id'],
 					'name'          => $_item['name'],
@@ -383,6 +384,108 @@ class ApiController extends BaseController
 			$memory_string = sprintf('Pic: %sMB. Current: %sMB', memory_get_peak_usage(true)/1024/1024, memory_get_usage(true)/1024/1024);
 			FileHelper::write($memory_string, 'memory_inventory');
 		}
+
+		$this->renderJSON($response);
+	}
+
+
+	public function inventory2Action()
+	{
+		$response = array();
+		$hash = null;
+		try {
+			$user_id = 7937;
+
+			$User = User::find($user_id)->toArray();
+			if(!$User) {
+				throw new \Exception('Invalid USER');
+			}
+
+			if($this->_cache) {
+				/*$response = $this->app->cache->get('api_user_inventory_'.$user_id);
+				if($response) {
+					$response['cache'] = true;
+					$this->renderJSON($response);
+				}*/
+			}
+
+			$data = array(
+				'date' => time(),
+				'items' => array(),
+			);
+
+
+			$_where = [
+				'i.owner = :owner',
+				'i.setsale = 0', //не в продаже
+				'i.type not in (77, 200)',
+				'i.otdel != 62',
+				'(i.prototype not between 3000 and 3030)',
+				'(i.prototype not between 103000 and 103030)',
+				'(i.prototype not between 3003000 and 3003100)',
+				'(i.prototype not between 3003200 and 3003400)',
+				'(i.prototype not between 1009999 and 1020001)',
+				'(i.prototype not between 15550 and 15569)'
+			];
+			$sql = sprintf('select i.id, i.name, i.letter, i.dressed, i.goden, i.dategoden, i.duration, i.maxdur, i.massa, i.includemagic, i.includemagicname, i.includemagicdex, i.includemagicmax, i.includemagicuses from inventory i USE INDEX (owner,type,prototype) where %s', implode(' and ', $_where));
+			$pdo = Capsule::connection()->getPdo();
+			$stmt = $pdo->prepare($sql);
+			$stmt->execute([':owner' => $User['id']]);
+			$_items = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+			foreach ($_items as $_item) {
+				$temp = array(
+					'id'            => (int)$_item['id'],
+					'name'          => $_item['name'],
+					'description'   => $_item['letter'],
+					'magic'         => array(),
+					'is_dressed'    => $_item['dressed'],
+					'expire'        => $_item['goden'] > 0 ? $_item['dategoden'] : 0,
+					'duration'      => array(
+						'current'   => $_item['duration'],
+						'max'       => $_item['maxdur'],
+					),
+					'mass'			=> $_item['massa'],
+				);
+				if($_item['includemagic']) {
+					$temp['magic'] = array(
+						'name'      => $_item['includemagicname'],
+						'magic'     => $_item['includemagic'],
+						'have_use'  => $_item['includemagicdex'],
+						'max_use'   => $_item['includemagicmax'],
+						'recharge'  => $_item['includemagicuses'],
+					);
+				}
+
+				$data['items'][] = $temp;
+
+				unset($temp);
+				unset($_item);
+			}
+
+			$response = array(
+				'status'   => 1,
+				'success' => true,
+				//'crypt'     => $hash,
+				'response'  => $data
+			);
+
+			if($this->_cache) {
+				$this->app->cache->set('api_user_inventory_'.$user_id, $response, $this->_cache_time);
+			}
+
+		} catch (\Exception $ex) {
+			$response = array(
+				'status'     => 0,
+				'error' => true,
+				//'crypt'     => $hash,
+				'message'   => 'We have some problem, try later',
+			);
+
+			FileHelper::writeException($ex, 'api');
+		}
+
+		$memory_string = sprintf('Pic: %sMB. Current: %sMB', memory_get_peak_usage(true)/1024/1024, memory_get_usage(true)/1024/1024);
+		var_dump($memory_string);die;
 
 		$this->renderJSON($response);
 	}
