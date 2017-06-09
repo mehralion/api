@@ -53,6 +53,16 @@ class ApiController extends BaseController
 
 	}
 
+	public function timeAction()
+	{
+		$response = [
+			'status' => 1,
+			'time' => time(),
+		];
+
+		$this->renderJSON($response);
+	}
+
 	public function playerAction()
 	{
 		$response = array();
