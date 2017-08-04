@@ -22,6 +22,6 @@ namespace app\model;
  */
 class UserComplect extends BaseModal
 {
-	protected $table = 'users_complect';
+	protected $table = 'users_complect2';
 	public $primaryKey = 'id';
 }
