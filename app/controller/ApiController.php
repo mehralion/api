@@ -855,6 +855,7 @@ class ApiController extends BaseController
 			$isOnline = (int)(time()-$User->odate < 60*5);
 
 			$response['data'] = [
+				'id' 			=> $User->id,
 				'login' 		=> $User->login,
 				'level' 		=> $User->level,
 				'align' 		=> $User->align,
