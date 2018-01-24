@@ -10,7 +10,7 @@ return [
 		'host'              => 'db27veryfastoldbk.c4c2zvyoc0zt.eu-west-1.rds.amazonaws.com',
 		'dbname'            => 'oldbk',
 		'username'          => 'oldbk',
-		'password'          => 'Mwk92ms02na90dhusd32sd3931c',
+		'password'          => 'sRnNZ5XPxd93pyFDhkoAs39l',
 		'charset'           => 'cp1251'
 	],
 ];
