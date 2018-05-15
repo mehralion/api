@@ -186,6 +186,23 @@ class User extends BaseModal
 				$add_bonus[2] = 250;
 				$add_bonus[3] = 500;
 				$gsum += $add_bonus[$this->prem];
+
+
+				$naems = UserClons::whereRaw('owner = ?', [$this->id])->get(['passkills'])->toArray();
+				foreach ($naems as $naem) {
+					if($naem['passkills'] == '') {
+						continue;
+					}
+
+					try {
+						$paskill = unserialize($naem['passkills']);
+						if (isset($paskill[20002]['active']) && isset($paskill[20002]['procent']) && $paskill[20002]['active'] == 1) {
+							$gsum += round($paskill[20002]['procent']);
+						}
+					} catch (\Exception $ex) {
+
+					}
+				}
 			}
 
 
