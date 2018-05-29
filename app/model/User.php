@@ -177,15 +177,17 @@ class User extends BaseModal
 			$gsum = 0;
 
 			/*
-			áîíóñû îò ïðåì. àêê.
+			Ð±Ð¾Ð½ÑƒÑÑ‹ Ð¾Ñ‚ Ð¿Ñ€ÐµÐ¼. Ð°ÐºÐº.
 			*/
 
-			//Îòêëþ÷àòü äåéñòâèå áîíóñà + ê ðþêçàêó îò ïðåìèóì-àêêàóíòîâ â òóðíèðàõ Áàøíè ñìåðòè è Ðóèí
-			if ($this->in_tower == 0 && $this->ruines == 0 && $this->prem > 0) {
-				$add_bonus[1] = 50;
-				$add_bonus[2] = 250;
-				$add_bonus[3] = 500;
-				$gsum += $add_bonus[$this->prem];
+			//ÐžÑ‚ÐºÐ»ÑŽÑ‡Ð°Ñ‚ÑŒ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ðµ Ð±Ð¾Ð½ÑƒÑÐ° + Ðº Ñ€ÑŽÐºÐ·Ð°ÐºÑƒ Ð¾Ñ‚ Ð¿Ñ€ÐµÐ¼Ð¸ÑƒÐ¼-Ð°ÐºÐºÐ°ÑƒÐ½Ñ‚Ð¾Ð² Ð² Ñ‚ÑƒÑ€Ð½Ð¸Ñ€Ð°Ñ… Ð‘Ð°ÑˆÐ½Ð¸ ÑÐ¼ÐµÑ€Ñ‚Ð¸ Ð¸ Ð ÑƒÐ¸Ð½
+			if ($this->in_tower == 0 && $this->ruines == 0) {
+				if($this->prem > 0) {
+					$add_bonus[1] = 50;
+					$add_bonus[2] = 250;
+					$add_bonus[3] = 500;
+					$gsum += $add_bonus[$this->prem];
+				}
 
 
 				$naems = UserClons::whereRaw('owner = ?', [$this->id])->get(['passkills'])->toArray();
@@ -195,10 +197,13 @@ class User extends BaseModal
 					}
 
 					try {
-						$paskill = unserialize($naem['passkills']);
+						$data = preg_replace_callback('!s:(\d+):"(.*?)";!', function($m) { return 's:'.strlen($m[2]).':"'.$m[2].'";'; }, $naem['passkills']);
+						$paskill = unserialize($data);
+
 						if (isset($paskill[20002]['active']) && isset($paskill[20002]['procent']) && $paskill[20002]['active'] == 1) {
 							$gsum += round($paskill[20002]['procent']);
 						}
+						
 					} catch (\Exception $ex) {
 
 					}
