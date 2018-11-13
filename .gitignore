@@ -1,0 +1,5 @@
+/vendor
+/composer.lock
+/logs
+/_ide_helper.php
+/config/prod.php
